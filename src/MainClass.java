@@ -1,6 +1,8 @@
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,8 +12,8 @@ interface googleClassroom{
 
     public void viewLectureMaterial();
     public void viewAssessments();
-    public void viewComments();
-  public void addComments();
+    public void viewComments(ArrayList<comments> temp);
+  public void addComments(ArrayList<comments> temp ,String time, String name ,String content);
 
   public void  logout();
 
@@ -49,12 +51,30 @@ class student  implements googleClassroom{
     }
 
     @Override
-    public void viewComments() {
+    public void viewComments(ArrayList<comments> temp) {
+
+        int j=0;
+        for(comments i : temp ){
+
+            System.out.println("Comment no: "+j+" TimeStamp :" +i.getTime() );
+            System.out.println("Content :" +i.getContent());
+            j++;
+
+
+        }
 
     }
 
     @Override
-    public void addComments() {
+    public void addComments(ArrayList<comments> temp ,String time, String name ,String content) {
+
+
+        comments t= new comments();
+        t.setName(name);
+        t.setTime(time);
+        t.setContent(content);
+        temp.add(t);
+        System.out.println("Comment Added!!");
 
     }
 
@@ -86,13 +106,19 @@ class student  implements googleClassroom{
 class teacher implements googleClassroom {
 
 
-    private HashMap<String, ArrayList<String>> slide = new HashMap<>();
-    private HashMap<String, String> video = new HashMap<>();
-    private HashMap<String , ArrayList<Integer>> assigment = new HashMap<>();
+    private material mat;
 
-
+    private HashMap<String , ArrayList<Integer>> assigment ;
 
     private String id;
+public teacher(){
+
+    id="Default";
+    mat= new material();
+    assigment = new HashMap<>();
+}
+
+
 
     public String getId() {
         return id;
@@ -102,21 +128,21 @@ class teacher implements googleClassroom {
         this.id = id;
     }
 
-    public HashMap<String, ArrayList<String>> getSlide() {
-        return slide;
-    }
+    //public HashMap<String, ArrayList<String>> getSlide() {
+    //    return slide;
+   // }
 
-    public HashMap<String, String> getVideo() {
-        return video;
-    }
+ //   public HashMap<String, String> getVideo() {
+//        return video;
+  //  }
 
-    public void setSlide(HashMap<String, ArrayList<String>> slide) {
-        this.slide = slide;
-    }
+  //  public void setSlide(HashMap<String, ArrayList<String>> slide) {
+   //     this.slide = slide;
+   // }
 
-    public void setVideo(HashMap<String, String> video) {
-        this.video = video;
-    }
+ //   public void setVideo(HashMap<String, String> video) {
+   //     this.video = video;
+    //}
 
     public HashMap<String, ArrayList<Integer>> getAssigment() {
         return assigment;
@@ -129,6 +155,49 @@ class teacher implements googleClassroom {
     @Override
     public void viewLectureMaterial() {
 
+
+    if(this.mat.getSlide().isEmpty()){
+
+        System.out.println("No Slides present");
+
+
+    }
+
+    else {
+        for (String i : this.mat.getSlide().keySet()) {
+
+
+            System.out.println("Title  :" + i);
+
+            int count = 1;
+
+            for (String j : this.mat.getSlide().get(i)) {
+
+                System.out.println("Slide " + count + " : " + j);
+                count++;
+
+
+            }
+
+            System.out.println("Mose recent Date of upload :" + this.mat.getTimeSlide().get(i));
+
+
+        }
+    }
+
+    if(this.mat.getVideo().isEmpty()){
+        System.out.println("No Video content present !");
+        return;
+
+    }
+
+      System.out.println("The name of the video : " +this.mat.getVideo().get(this.id));
+
+    System.out.println("Mose recent time of upload :" +this.mat.getTimeVideo().get(this.id));
+
+
+
+
     }
 
     @Override
@@ -137,12 +206,29 @@ class teacher implements googleClassroom {
     }
 
     @Override
-    public void viewComments() {
+    public void viewComments(ArrayList<comments> temp) {
+     int j=0;
+    for(comments i : temp ){
+
+        System.out.println("Comment no: "+j+" TimeStamp :" +i.getTime() );
+        System.out.println("Content :" +i.getContent());
+        j++;
+
+
+    }
 
     }
 
     @Override
-    public void addComments() {
+    public void addComments(ArrayList<comments> temp ,String time, String name ,String content) {
+
+
+        comments t= new comments();
+        t.setName(name);
+        t.setTime(time);
+        t.setContent(content);
+        temp.add(t);
+        System.out.println("Comment Added!!");
 
     }
 
@@ -193,7 +279,11 @@ class teacher implements googleClassroom {
 
             }
 
-            this.slide.put(topic,topicSlides);
+            this.mat.getSlide().put(topic, topicSlides);
+            this.mat.setName(this.id);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            this.mat.getTimeVideo().put(this.id ,dtf.format(now));
 
 
 
@@ -204,11 +294,15 @@ class teacher implements googleClassroom {
         else if(choice ==2){
 
 
-System.out.println("Enter the topic of the video: ");
-String  topic= br.readLine();
-System.out.println("Enter the name of the video :");
-String videoContent =br.readLine();
-this.video.put(topic ,videoContent);
+            System.out.println("Enter the topic of the video: ");
+            String  topic= br.readLine();
+            System.out.println("Enter the name of the video :");
+            String videoContent =br.readLine();
+            this.mat.getVideo().put(topic ,videoContent);
+            this.mat.setName(this.id);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            this.mat.getTimeVideo().put(this.id, dtf.format(now));
 
 
 
@@ -257,12 +351,18 @@ this.video.put(topic ,videoContent);
 
         else if(choice ==2){
 
+            System.out.println("Enter Quiz Question : ");
 
-            System.out.println("Enter the topic of the video: ");
-            String  topic= br.readLine();
-            System.out.println("Enter the name of the video :");
-            String videoContent =br.readLine();
-            this.video.put(topic ,videoContent);
+            String topic= br.readLine();
+
+            System.out.println("Enter the max marks:");
+            int n=Integer.parseInt(br.readLine());
+            ArrayList<Integer> temp = new ArrayList<>();
+            temp.add(n);
+
+
+
+            this.assigment.put(topic,temp);
 
 
 
@@ -284,10 +384,120 @@ this.video.put(topic ,videoContent);
 
 
 
+class material{
+
+private HashMap<String , String> timeSlide = new HashMap<>();
+private HashMap<String ,String> timeVideo = new HashMap<>();
+private String name;
+private HashMap<String, ArrayList<String>> slide = new HashMap<>();
+private HashMap<String, String> video = new HashMap<>();
+
+
+    public HashMap<String , String> getTimeSlide() {
+        return timeSlide;
+    }
+
+    public void setTimeSlide(HashMap<String , String>time) {
+        this.timeSlide = time;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+
+    public HashMap<String, ArrayList<String>> getSlide() {
+        return slide;
+    }
+
+    public void setSlide(HashMap<String, ArrayList<String>> slide) {
+        this.slide = slide;
+    }
+
+    public HashMap<String, String> getVideo() {
+        return video;
+    }
+
+    public void setVideo(HashMap<String, String> video) {
+        this.video = video;
+    }
+
+    public HashMap<String , String> getTimeVideo() {
+        return timeVideo;
+    }
+
+    public void setTimeVideo(HashMap<String , String>timeVideo) {
+        this.timeVideo = timeVideo;
+    }
+}
+
+class assesment{
+
+
+    String assigmentName;
+    int assigmentGrade;
+
+
+    public String getAssigmentName() {
+        return assigmentName;
+    }
+
+    public void setAssigmentName(String assigmentName) {
+        this.assigmentName = assigmentName;
+    }
+
+    public int getAssigmentGrade() {
+        return assigmentGrade;
+    }
+
+    public void setAssigmentGrade(int assigmentGrade) {
+        this.assigmentGrade = assigmentGrade;
+    }
+}
+
+class comments {
+
+    private String time;
+    private  String name;
+    private String content ;
+
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+}
+
 
 public class MainClass {
 
     public static void main(String arg[]) throws Exception {
+
+        ArrayList<comments> comm = new ArrayList<>();
 
 
         HashMap<String, teacher> t = new HashMap<>();
@@ -324,7 +534,14 @@ public class MainClass {
 
                     case 1 :
                         temp.addLectureAndVideo(br);
+                        break;
                     case 2:
+
+                        break;
+                    case 7 :
+
+                        temp.viewComments(comm);
+
 
                 }
 
