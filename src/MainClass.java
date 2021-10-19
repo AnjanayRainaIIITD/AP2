@@ -95,8 +95,6 @@ class student  implements googleClassroom{
 
 
 
-
-
     }
 
     @Override
@@ -196,9 +194,10 @@ class student  implements googleClassroom{
 
 
 
+
                 System.out.println("Name of assigment : " +i);
                 System.out.println("Grade in assigemnt : " + this.ass.get(i).getMarks());
-                System.out.println("Graded by :" +this.ass.get(i).getName());
+                System.out.println("Graded by :" +this.ass.get(i).getGrader());
 
 
 
@@ -213,28 +212,19 @@ class student  implements googleClassroom{
 
             System.out.println("Name of the Quiz :" +i);
             System.out.println("Grade of the Quiz :" +this.q.get(i).getGrade());
-            System.out.println("Graded by  :" +this.q.get(i).getGrade());
+            System.out.println("Graded by  :" +this.q.get(i).getGrader());
 
 
         }
 
 
     }
+public boolean isZip(String name){
 
-    public void setQuizGrade(String grader){
-
-
-
-
-    }
+        return name.endsWith(".zip");
 
 
-    public void setAssigmentGrade(String grader){
-
-
-
-
-    }
+}
 
     public void submitAssesment(HashMap<String , teacher> h, BufferedReader br)  throws  Exception{
 
@@ -246,6 +236,10 @@ class student  implements googleClassroom{
             for(String k : a.keySet()){
 
 
+                if(!a.get(k).isOpen()){
+                    continue;
+
+                }
 
                 System.out.println("ID :" +j + " Name : "+a.get(k).getName());
                 temp.add(a.get(k));
@@ -255,6 +249,11 @@ class student  implements googleClassroom{
 
 
 
+        }
+
+        if(temp.size()==0){
+            System.out.println("No pending assigemnts");
+            return ;
 
 
         }
@@ -263,12 +262,17 @@ class student  implements googleClassroom{
         int n=Integer.parseInt(br.readLine());
         System.out.println("Enter the file name for submittion :");
         String fileName =br.readLine();
+
+        if(!isZip(fileName)){
+
+            System.out.println("Please give only zip format files!!");
+            return;
+
+
+        }
         assigment studentSubmission =temp.get(n);
         studentSubmission.setSubmitted(true);
         studentSubmission.setFileName(fileName);
-
-
-
 
 
 
@@ -284,7 +288,11 @@ class student  implements googleClassroom{
             for(String k : a.keySet()){
 
 
+                if(!a.get(i).isOpen())
+                {
+                    continue;
 
+                }
                 System.out.println("ID :" +j + " Name : "+a.get(k).getName());
                 temp.add(a.get(k));
                 j++;
@@ -293,10 +301,15 @@ class student  implements googleClassroom{
 
 
 
+        }
+
+        if(temp.size()==0){
+
+            System.out.println("No pending Quizes!!");
+            return ;
 
 
         }
-
 
         System.out.println("Enter the ID for Quiz :");
         int n=Integer.parseInt(br.readLine());
@@ -307,15 +320,7 @@ class student  implements googleClassroom{
         studentSubmission.setAnswer(fileName);
 
 
-
-
-
-
     }
-
-
-
-
 
     public HashMap<String, quiz> getQ() {
         return q;
@@ -412,6 +417,7 @@ public teacher(){
 for(String i :this.mat.getVideo().keySet()){
 
     System.out.println("Name of Video :" +i);
+    System.out.println("Name of the file :" + this.mat.getVideo().get(i));
     System.out.println("Last time of edit :" +this.mat.getTimeVideo().get(i));
 
 
@@ -428,7 +434,7 @@ for(String i :this.mat.getVideo().keySet()){
     System.out.println("The lecture material is :");
     this.viewLectureMaterial();
 
-System.out.println("All the assesments done by you are :");
+System.out.println("All the assesments for you are :");
 System.out.println("Quiz  :");
 for(String i : this.q.keySet()){
 
@@ -445,14 +451,11 @@ System.out.println("Assigment :");
 for(String i : this.ass.keySet()){
 
 
-    System.out.println(i+ " , status :" +((this.ass.get(i).isStatus())? "Closed" :"Open" ));
+    System.out.println(i+ " , status :" +((this.ass.get(i).isOpen())? "Open" :"Closed" ));
     System.out.println("Max Marks :" +this.ass.get(i).getMaxMarks());
 
 
 }
-
-
-
 
 
 
@@ -508,6 +511,20 @@ for(String i : this.ass.keySet()){
 
     }
 
+    public boolean isZip(String name){
+
+    return name.endsWith(".zip");
+
+
+    }
+
+    public boolean isVideo(String name){
+
+    return  name.endsWith(".mp4");
+
+
+    }
+
 
     public void addLectureAndVideo( BufferedReader br ) throws Exception {
 
@@ -552,6 +569,14 @@ for(String i : this.ass.keySet()){
             String  topic= br.readLine();
             System.out.println("Enter the name of the video :");
             String videoContent =br.readLine();
+
+if(!isVideo(videoContent)){
+    System.out.println("Please enter proper format file");
+    return ;
+
+
+}
+
             this.mat.getVideo().put(topic ,videoContent);
 
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -564,29 +589,20 @@ for(String i : this.ass.keySet()){
 
         else{
 
-
             return ;
-
 
         }
 
-
     }
 
-
-
     public void addQuiz(BufferedReader br, HashMap<String, quiz> h ,String topic ,HashMap<String , student> st  ) throws Exception {
-
-
-
-
 
         quiz  qu= new quiz();
         qu.setName(topic);
         qu.setStatus(false);
 
 
-        if(ass.containsKey(topic)){
+        if(this.ass.containsKey(topic)){
             h.put(topic, qu);
             return ;
 
@@ -600,8 +616,6 @@ for(String i : this.ass.keySet()){
             st.get(i).getQ().put(topic, qu);
 
         }
-
-
 
 
 
@@ -620,7 +634,7 @@ for(String i : this.ass.keySet()){
 
             temp.setMaxMarks(n);
 
-            if(ass.containsKey(topic)){
+            if(this.ass.containsKey(topic)){
                 h.put(topic, temp);
                 return ;
 
@@ -642,13 +656,7 @@ for(String i : this.ass.keySet()){
         }
 
 
-
-
-
-
-
-
-    public void gradeAssesment(quiz temp , BufferedReader br) throws  Exception{
+    public void gradeAssesment(quiz temp , BufferedReader br ,String name) throws  Exception{
 
 
 
@@ -673,13 +681,14 @@ for(String i : this.ass.keySet()){
             return ;
         }
         temp.setGrade(n);
-        temp.setStatus(true);
+        temp.setGraded(true);
+        temp.setGrader(name);
 
 
 
     }
 
-    public void gradeAssesment(assigment temp ,BufferedReader br) throws  Exception{
+    public void gradeAssesment(assigment temp ,BufferedReader br ,String name) throws  Exception{
 
 
     if(!temp.isSubmitted()){
@@ -704,7 +713,8 @@ for(String i : this.ass.keySet()){
         }
 
         temp.setMarks(n);
-        temp.setStatus(true);
+        temp.setGraded(true);
+        temp.setGrader(name);
 
 
 
@@ -714,12 +724,12 @@ for(String i : this.ass.keySet()){
 
 
 
-    if(!temp.isStatus()){
+    if(!temp.isOpen()){
         System.out.println("The assigemnt has already been closed");
         return ;
 
     }
-    temp.setStatus(true);
+ temp.setOpen(false);
 
     System.out.println("The assigment has been closes !!");
 
@@ -729,13 +739,13 @@ for(String i : this.ass.keySet()){
 
     public void closeAssesment(quiz temp ,BufferedReader br) throws  Exception{
 
-        if(!temp.isStatus()){
+        if(!temp.isOpen()){
             System.out.println("The quiz has already been closed");
             return ;
 
         }
 
-    temp.setStatus(true);
+    temp.setOpen(false);
 
     System.out.println("The quiz has been closed!!");
 
@@ -833,6 +843,15 @@ private HashMap<String, String> video = new HashMap<>();
 
 class quiz{
     private boolean open=true;
+    private boolean graded =false;
+
+    public boolean isGraded() {
+        return graded;
+    }
+
+    public void setGraded(boolean graded) {
+        this.graded = graded;
+    }
 
     public boolean isOpen() {
         return open;
@@ -909,7 +928,27 @@ class quiz{
 
 class assigment{
 
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    private boolean open=true;
+
+
 private String grader;
+private boolean graded=false;
+
+    public boolean isGraded() {
+        return graded;
+    }
+
+    public void setGraded(boolean graded) {
+        this.graded = graded;
+    }
 
     public String getGrader() {
         return grader;
@@ -1052,6 +1091,12 @@ public class MainClass {
                 if (n == 1) {
 
                     boolean running = true;
+                    for(String i :t.keySet()){
+
+                        System.out.println(i);
+
+
+                    }
                     System.out.println("Plesase Enter the ID of instructor: ");
                     String id = br.readLine();
                     teacher temp = t.get(id);
@@ -1129,10 +1174,9 @@ public class MainClass {
 
 
                                     }
-                                    System.out.println("Enter the name of the assigemnt you want to grade: ");
+                                    System.out.println("Enter the name of the assigment you want to grade: ");
                                     String assName=br.readLine();
-
-                                    temp.gradeAssesment( st.getAss().get(assName),br);
+                                    temp.gradeAssesment( st.getAss().get(assName),br , temp.getId());
 
                                 }
 
@@ -1146,7 +1190,7 @@ public class MainClass {
 
                                     System.out.println("Enter the name of the quiz you want to grade :");
                                     String qName =br.readLine();
-                                    temp.gradeAssesment(st.getQ().get(qName) ,br);
+                                    temp.gradeAssesment(st.getQ().get(qName) ,br ,temp.getId());
 
                                 }
 
@@ -1195,6 +1239,12 @@ public class MainClass {
 
 
                             case 7:
+                                if(comm.isEmpty()){
+
+                                    System.out.println("The comment section is Empty");
+                                    return;
+
+                                }
 
                                 temp.viewComments(comm);
                                 break;
@@ -1216,6 +1266,12 @@ public class MainClass {
 
                 } else if (n == 2) {
 
+                    for(String i :s.keySet()){
+
+                        System.out.println(i);
+
+
+                    }
 
                     boolean running =true;
                     System.out.println("Plesase Enter the ID of  student : ");
@@ -1268,13 +1324,18 @@ public class MainClass {
                                 temp.viewGrades();
                                 break;
                             case 5:
+                                if(comm.isEmpty()){
+
+                                    System.out.println("The comment section is Empty");
+                                    return;
+
+                                }
                                 temp.viewComments(comm);
 
                                 break;
                             case 6:
                                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                                 LocalDateTime now = LocalDateTime.now();
-
                                 System.out.println("Add comment :");
                                 String c = br.readLine();
                                 temp.addComments(comm, dtf.format(now), id, c);
