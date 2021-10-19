@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ interface googleClassroom{
 
     public void viewLectureMaterial();
     public void viewAssessments();
+
     public void viewComments(ArrayList<comments> temp);
   public void addComments(ArrayList<comments> temp ,String time, String name ,String content);
 
@@ -25,12 +25,19 @@ interface googleClassroom{
 class student  implements googleClassroom{
 
 
+    private HashMap<String , quiz> q;
+    private HashMap<String, assigment > ass;
     private String id;
+
     public student (){
+
         id= "Default";
 
+        ass = new HashMap<>();
+        q= new HashMap<>();
 
     }
+
 
     public String getId() {
         return id;
@@ -45,8 +52,82 @@ class student  implements googleClassroom{
 
     }
 
+    public void viewLecture(material mat){
+
+        if(mat.getSlide().isEmpty()){
+
+            System.out.println("No Slides present");
+
+
+        }
+
+        else {
+            for (String i : mat.getSlide().keySet()) {
+
+
+                System.out.println("Title  :" + i);
+
+                int count = 1;
+
+                for (String j : mat.getSlide().get(i)) {
+
+                    System.out.println("Slide " + count + " : " + j);
+                    count++;
+
+
+                }
+
+                System.out.println("Mose recent Date of upload :" + mat.getTimeSlide().get(i));
+
+
+            }
+        }
+
+        if(mat.getVideo().isEmpty()){
+            System.out.println("No Video content present !");
+            return;
+
+        }
+
+        System.out.println("The name of the video : " + mat.getVideo().get(this.id));
+
+        System.out.println("Mose recent time of upload :" + mat.getTimeVideo().get(this.id));
+
+
+
+
+
+    }
+
     @Override
     public void viewAssessments() {
+
+    }
+
+    public void viewAssessments(teacher t) {
+
+
+        System.out.println("The lecture material is :");
+        t.viewLectureMaterial();
+
+        System.out.println("All the assesments done by you are :");
+        System.out.println("Quiz  :");
+        for(String i : this.q.keySet()){
+
+
+            System.out.println(i + " , status  :" +((this.q.get(i).isOpen()) ? "Open" : "Closed") );
+
+
+        }
+
+        for(String i : this.ass.keySet()){
+
+
+            System.out.println(i+ " , status :" +((this.ass.get(i).isStatus())? "Closed" :"Open" ));
+
+        }
+
+
 
     }
 
@@ -100,22 +181,84 @@ class student  implements googleClassroom{
 
     }
 
+    public  void viewGrades(){
 
+
+        System.out.println("Graded Assigements :");
+        for(String i : this.ass.keySet()){
+
+
+
+            if(this.ass.get(i).isSubmitted()){
+
+                System.out.println("Name of assigment : " +i);
+                System.out.println("Grade in assigemnt : " + this.ass.get(i).getMarks());
+                System.out.println("Graded by :" +this.ass.get(i).getName());
+
+
+
+            }
+
+
+
+        }
+
+
+    }
+
+    public void setQuizGrade(String grader){
+
+
+
+
+    }
+
+
+    public void setAssigmentGrade(String grader){
+
+
+
+
+    }
+
+
+    public HashMap<String, quiz> getQ() {
+        return q;
+    }
+
+    public void setQ(HashMap<String, quiz> q) {
+        this.q = q;
+    }
+
+    public HashMap<String, assigment> getAss() {
+        return ass;
+    }
+
+    public void setAss(HashMap<String, assigment> ass) {
+        this.ass = ass;
+    }
 }
 
-class teacher implements googleClassroom {
+class teacher implements googleClassroom
+{
 
 
     private material mat;
 
-    private HashMap<String , ArrayList<Integer>> assigment ;
+    private HashMap<String , quiz> q;
+
+    private HashMap<String, assigment > ass;
+
+   // private HashMap<String , ArrayList<Integer>> assigment ;
 
     private String id;
+
+
 public teacher(){
 
     id="Default";
     mat= new material();
-    assigment = new HashMap<>();
+
 }
 
 
@@ -144,13 +287,7 @@ public teacher(){
    //     this.video = video;
     //}
 
-    public HashMap<String, ArrayList<Integer>> getAssigment() {
-        return assigment;
-    }
 
-    public void setAssigment(HashMap<String, ArrayList<Integer>> assigment) {
-        this.assigment = assigment;
-    }
 
     @Override
     public void viewLectureMaterial() {
@@ -202,6 +339,31 @@ public teacher(){
 
     @Override
     public void viewAssessments() {
+
+    System.out.println("The lecture material is :");
+    this.viewLectureMaterial();
+
+System.out.println("All the assesments done by you are :");
+System.out.println("Quiz  :");
+for(String i : this.q.keySet()){
+
+
+    System.out.println(i + " , status  :" +((this.q.get(i).isOpen()) ? "Open" : "Closed") );
+
+
+}
+
+for(String i : this.ass.keySet()){
+
+
+    System.out.println(i+ " , status :" +((this.ass.get(i).isStatus())? "Closed" :"Open" ));
+
+}
+
+
+
+
+
 
     }
 
@@ -280,10 +442,10 @@ public teacher(){
             }
 
             this.mat.getSlide().put(topic, topicSlides);
-            this.mat.setName(this.id);
+            this.mat.setNameSlide(this.id);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
-            this.mat.getTimeVideo().put(this.id ,dtf.format(now));
+            this.mat.getTimeSlide().put(this.id ,dtf.format(now));
 
 
 
@@ -299,7 +461,7 @@ public teacher(){
             System.out.println("Enter the name of the video :");
             String videoContent =br.readLine();
             this.mat.getVideo().put(topic ,videoContent);
-            this.mat.setName(this.id);
+            this.mat.setNameVideo(this.id);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             this.mat.getTimeVideo().put(this.id, dtf.format(now));
@@ -320,64 +482,159 @@ public teacher(){
 
 
 
-    public void addAssesment(BufferedReader br) throws Exception{
-
-
-
-        System.out.println("1. Add Assignment\n" +
-                "2. Add Quiz");
-
-        int choice  =Integer.parseInt(br.readLine());
-        if(choice ==1){
-
-            System.out.println("Enter problem statement : ");
-
-            String topic= br.readLine();
-
-            System.out.println("Enter the max marks:");
-            int n=Integer.parseInt(br.readLine());
-            ArrayList<Integer> temp = new ArrayList<>();
-            temp.add(n);
-
-
-
-            this.assigment.put(topic,temp);
+    public void addQuiz(BufferedReader br, HashMap<String, quiz> h ,String topic  ) throws Exception {
 
 
 
 
 
-        }
-
-        else if(choice ==2){
-
-            System.out.println("Enter Quiz Question : ");
-
-            String topic= br.readLine();
-
-            System.out.println("Enter the max marks:");
-            int n=Integer.parseInt(br.readLine());
-            ArrayList<Integer> temp = new ArrayList<>();
-            temp.add(n);
+        quiz  qu= new quiz();
+        qu.setName(topic);
+        qu.setStatus(false);
 
 
-
-            this.assigment.put(topic,temp);
-
-
-
-        }
-
-        else{
-
+        if(ass.containsKey(topic)){
+            h.put(topic, qu);
             return ;
 
 
         }
 
+        this.q.put(topic, qu);
+        h.put(topic, qu);
+
+
+            //   this.ass.put(topic,temp);
+
 
 
     }
+
+        public void addAssesment(BufferedReader br, HashMap<String , assigment> h,  String topic , int n) throws  Exception{
+
+
+
+
+
+            assigment temp = new assigment();
+
+            temp.setName(topic);
+
+            temp.setMaxMarks(n);
+
+            if(ass.containsKey(topic)){
+                h.put(topic, temp);
+                return ;
+
+
+            }
+            this.ass.put(topic, temp);
+            h.put(topic, temp);
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+    public void gradeAssesment(quiz temp,BufferedReader br) throws  Exception{
+
+
+
+
+        if(!temp.isStatus()){
+            System.out.println("No submissions were given ");
+
+
+        }
+
+        else {
+
+            System.out.println("Submission :" + temp.getAnswer());
+
+        }
+
+        System.out.println("Give grade :");
+        int n=Integer.parseInt(br.readLine());
+
+        if(n!=1 ||  n!=0){
+            System.out.println("The grade given must be 1 or 0 for quiz!!");
+            return ;
+
+
+        }
+        temp.setGrade(n);
+
+
+    }
+
+    public void gradeAssesment(assigment temp ,BufferedReader br) throws  Exception{
+
+
+    if(!temp.isSubmitted()){
+        System.out.println("No submissions were given ");
+
+    }
+
+    else {
+
+        System.out.println("Submission :" + temp.getFileName());
+
+    }
+
+    System.out.println("Give grade :");
+    int n=Integer.parseInt(br.readLine());
+
+        if(n >temp.getMaxMarks()){
+            System.out.println("The grade given must less than max marks!!");
+            return ;
+
+
+        }
+    temp.setMarks(n);
+
+
+
+    }
+
+    public void closeAssesment(assigment temp ,BufferedReader br) throws  Exception{
+
+
+
+    if(!temp.isStatus()){
+        System.out.println("The assigemnt has already been closed");
+        return ;
+
+    }
+    temp.setStatus(true);
+
+    System.out.println("The assigment has been closes !!");
+
+
+
+    }
+
+    public void closeAssesment(quiz temp ,BufferedReader br) throws  Exception{
+
+        if(!temp.isStatus()){
+            System.out.println("The quiz has already been closed");
+            return ;
+
+        }
+
+    temp.setStatus(true);
+
+    System.out.println("The quiz has been closed!!");
+
+
+    }
+
 }
 
 
@@ -388,7 +645,8 @@ class material{
 
 private HashMap<String , String> timeSlide = new HashMap<>();
 private HashMap<String ,String> timeVideo = new HashMap<>();
-private String name;
+private String nameSlide;
+private String nameVideo;
 private HashMap<String, ArrayList<String>> slide = new HashMap<>();
 private HashMap<String, String> video = new HashMap<>();
 
@@ -401,15 +659,22 @@ private HashMap<String, String> video = new HashMap<>();
         this.timeSlide = time;
     }
 
-    public String getName() {
-        return name;
+
+    public String getNameSlide() {
+        return nameSlide;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameSlide(String nameSlide) {
+        this.nameSlide = nameSlide;
     }
 
+    public String getNameVideo() {
+        return nameVideo;
+    }
 
+    public void setNameVideo(String nameVideo) {
+        this.nameVideo = nameVideo;
+    }
 
     public HashMap<String, ArrayList<String>> getSlide() {
         return slide;
@@ -436,29 +701,145 @@ private HashMap<String, String> video = new HashMap<>();
     }
 }
 
-class assesment{
+class quiz{
+    private boolean open=true;
 
-
-    String assigmentName;
-    int assigmentGrade;
-
-
-    public String getAssigmentName() {
-        return assigmentName;
+    public boolean isOpen() {
+        return open;
     }
 
-    public void setAssigmentName(String assigmentName) {
-        this.assigmentName = assigmentName;
+    public void setOpen(boolean open) {
+        this.open = open;
     }
 
-    public int getAssigmentGrade() {
-        return assigmentGrade;
+    String grader;
+    String adder ;
+
+    public String getGrader() {
+        return grader;
     }
 
-    public void setAssigmentGrade(int assigmentGrade) {
-        this.assigmentGrade = assigmentGrade;
+    public void setGrader(String grader) {
+        this.grader = grader;
+    }
+
+    public String getAdder() {
+        return adder;
+    }
+
+    public void setAdder(String adder) {
+        this.adder = adder;
+    }
+
+    private String name;
+ private boolean status;
+ private String answer;
+ private int grade=0;
+
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public quiz(){
+
+     this.status =false;
+     this.open =true;
+
+
+ }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
+
+class assigment{
+
+
+    private boolean status=false;
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    private String fileName;
+    private String name;
+    private int maxMarks;
+    private int marks=0;
+    private boolean submitted=false;
+
+    public boolean isSubmitted() {
+        return submitted;
+    }
+
+    public void setSubmitted(boolean submitted) {
+        this.submitted = submitted;
+    }
+
+    public String getFileName() {
+
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getMaxMarks() {
+        return maxMarks;
+    }
+
+    public void setMaxMarks(int maxMarks) {
+        this.maxMarks = maxMarks;
+    }
+
+    public int getMarks() {
+        return marks;
+    }
+
+    public void setMarks(int marks) {
+        this.marks = marks;
+    }
+}
+
 
 class comments {
 
@@ -501,7 +882,7 @@ public class MainClass {
 
 
         HashMap<String, teacher> t = new HashMap<>();
-        t.put("I0" ,new teacher());
+        t.put("I0", new teacher());
         t.put("I1", new teacher());
 
         HashMap<String, student> s = new HashMap<>();
@@ -516,52 +897,120 @@ public class MainClass {
 
 
         while (true) {
-            System.out.println("Welcome to Backpack\n" +
-                    "1. Enter as instructor\n" +
-                    "2. Enter as student\n" +
-                    "3. Exit");
-            int n = Integer.parseInt(br.readLine());
-            if (n == 1) {
 
-                System.out.println("Plesase Enter the ID of instructor: ");
-                String id = br.readLine();
-                teacher temp = t.get(id);
 
-                System.out.println("Welcome : " + id);
-                temp.printAllFunctions();
-                System.out.println("Enter the function to perform :");
-                switch(Integer.parseInt(br.readLine())){
+                System.out.println("Welcome to Backpack\n" +
+                        "1. Enter as instructor\n" +
+                        "2. Enter as student\n" +
+                        "3. Exit");
+                int n = Integer.parseInt(br.readLine());
+                if (n == 1) {
 
-                    case 1 :
-                        temp.addLectureAndVideo(br);
-                        break;
-                    case 2:
+                    boolean running = true;
+                    while (running) {
+                        System.out.println("Plesase Enter the ID of instructor: ");
+                        String id = br.readLine();
+                        teacher temp = t.get(id);
 
-                        break;
-                    case 7 :
+                        System.out.println("Welcome : " + id);
+                        temp.printAllFunctions();
+                        System.out.println("Enter the function to perform :");
+                        switch (Integer.parseInt(br.readLine())) {
 
-                        temp.viewComments(comm);
+                            case 1:
+                                temp.addLectureAndVideo(br);
+                                break;
+                            case 2:
+
+                                System.out.println("1. Add Assignment\n" +
+                                        "2. Add Quiz");
+
+                                int choice = Integer.parseInt(br.readLine());
+
+                                if (choice == 1) {
+                                    System.out.println("Enter problem statement : ");
+
+                                    String topic = br.readLine();
+
+                                    System.out.println("Enter the max marks:");
+                                    int marks = Integer.parseInt(br.readLine());
+
+                                    for (String i : s.keySet()) {
+                                        temp.addAssesment(br, s.get(i).getAss(), topic, marks);
+                                    }
+
+                                } else if (choice == 2) {
+
+
+                                    System.out.println("Enter Quiz Question : ");
+
+                                    String topic = br.readLine();
+                                    for (String i : s.keySet()) {
+                                        temp.addQuiz(br, s.get(i).getQ(), topic);
+                                    }
+
+                                }
+
+
+                                break;
+                            case 3:
+                                temp.viewLectureMaterial();
+                                break;
+                            case 4:
+                                temp.viewAssessments();
+                                break;
+                            case 5:
+
+
+                                for (String i : s.keySet()) {
+
+
+                                    System.out.println(i);
+
+
+                                }
+                                System.out.println("Enter the name of the student you want to grade :");
+                                String studentName = br.readLine();
+                                student st = s.get(studentName);
+                                st.setAssigmentGrade( temp.getId());
+                                break;
+
+
+                            case 7:
+
+                                temp.viewComments(comm);
+                                break;
+                            case 8:
+                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                                LocalDateTime now = LocalDateTime.now();
+
+                                System.out.println("Add comment :");
+                                String c = br.readLine();
+                                temp.addComments(comm, dtf.format(now), id, c);
+                                break;
+                            case 9:
+                                running = false;
+                                break;
+
+
+                        }
+                    }
+
+                } else if (n == 2) {
+
+
+                } else {
+                    System.out.println("Logging Out!!");
+
+                    break;
 
 
                 }
 
-            }
-
-            else if(n==2){
-
 
             }
-
-            else{
-                System.out.println("Logging Out!!");
-
-                break;
-
-
-            }
-
 
         }
-
     }
-}
+
+
