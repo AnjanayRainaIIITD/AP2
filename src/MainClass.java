@@ -188,10 +188,12 @@ class student  implements googleClassroom{
 
 
         System.out.println("Graded Assesments :");
+        int count=0;
         for(String i : this.ass.keySet()){
 
 
 
+            if(!this.ass.get(i).isGraded())continue;
 
 
 
@@ -200,19 +202,36 @@ class student  implements googleClassroom{
                 System.out.println("Graded by :" +this.ass.get(i).getGrader());
 
 
+                count++;
 
 
 
         }
+
+        if(count == 0){
+            System.out.println("No Graded Assigments !!");
+
+
+        }
+        count=0;
 
         System.out.println("Graded Quiz :");
         for(String i :this.q.keySet()){
 
 
 
+            if(!this.q.get(i).isGraded())continue;
             System.out.println("Name of the Quiz :" +i);
             System.out.println("Grade of the Quiz :" +this.q.get(i).getGrade());
             System.out.println("Graded by  :" +this.q.get(i).getGrader());
+
+            count++;
+
+        }
+
+        if(count == 0){
+
+            System.out.println("No Graded Quiz !!");
 
 
         }
@@ -273,6 +292,7 @@ public boolean isZip(String name){
         assigment studentSubmission =temp.get(n);
         studentSubmission.setSubmitted(true);
         studentSubmission.setFileName(fileName);
+        studentSubmission.setSubmitted(true);
 
 
 
@@ -288,7 +308,7 @@ public boolean isZip(String name){
             for(String k : a.keySet()){
 
 
-                if(!a.get(i).isOpen())
+                if(!a.get(k).isOpen())
                 {
                     continue;
 
@@ -319,6 +339,7 @@ public boolean isZip(String name){
         studentSubmission.setStatus(true);
         studentSubmission.setAnswer(fileName);
 
+        studentSubmission.setSubmitted(true);
 
     }
 
@@ -845,6 +866,17 @@ class quiz{
     private boolean open=true;
     private boolean graded =false;
 
+    public boolean isSubmitted() {
+        return submitted;
+    }
+
+    public void setSubmitted(boolean submitted) {
+        this.submitted = submitted;
+    }
+
+    private boolean submitted=false;
+
+
     public boolean isGraded() {
         return graded;
     }
@@ -927,6 +959,9 @@ class quiz{
 }
 
 class assigment{
+
+
+
 
     public boolean isOpen() {
         return open;
@@ -1145,7 +1180,14 @@ public class MainClass {
 
                                 break;
                             case 3:
-                                temp.viewLectureMaterial();
+                                for(String i  : t.keySet()){
+
+                                    System.out.println("Instructor :"
+                                            + i);
+                                    t.get(i).viewLectureMaterial();
+
+
+                                }
                                 break;
                             case 4:
                                 temp.viewAssessments();
@@ -1199,7 +1241,7 @@ public class MainClass {
                             case 6:
 
 
-                                System.out.println("Do you want to close a Assigment or quiz :");
+                                System.out.println("Do you want to close a Assigment(1) or quiz(2) :");
                                 int ch =Integer.parseInt(br.readLine());
 
                                 if(ch==1){
@@ -1344,11 +1386,7 @@ public class MainClass {
                                 temp.logout();
                                 running=false;
 
-
-
                         }
-
-
 
                     }
 
