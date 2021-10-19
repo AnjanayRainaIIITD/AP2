@@ -8,7 +8,6 @@ import java.util.HashMap;
 interface googleClassroom{
 
 
-
     public void viewLectureMaterial();
     public void viewAssessments();
 
@@ -35,6 +34,10 @@ class student  implements googleClassroom{
 
         ass = new HashMap<>();
         q= new HashMap<>();
+
+    }
+    public void viewLectureMaterial(String topic){
+
 
     }
 
@@ -258,6 +261,9 @@ public teacher(){
 
     id="Default";
     mat= new material();
+    q= new HashMap<>();
+    ass= new HashMap<>();
+
 
 }
 
@@ -328,10 +334,14 @@ public teacher(){
 
     }
 
-      System.out.println("The name of the video : " +this.mat.getVideo().get(this.id));
+for(String i :this.mat.getVideo().keySet()){
 
-    System.out.println("Mose recent time of upload :" +this.mat.getTimeVideo().get(this.id));
+    System.out.println("Name of Video :" +i);
+    System.out.println("Last time of edit :" +this.mat.getTimeVideo().get(i));
 
+
+
+}
 
 
 
@@ -442,10 +452,10 @@ for(String i : this.ass.keySet()){
             }
 
             this.mat.getSlide().put(topic, topicSlides);
-            this.mat.setNameSlide(this.id);
+
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
-            this.mat.getTimeSlide().put(this.id ,dtf.format(now));
+            this.mat.getTimeSlide().put(topic ,dtf.format(now));
 
 
 
@@ -461,10 +471,10 @@ for(String i : this.ass.keySet()){
             System.out.println("Enter the name of the video :");
             String videoContent =br.readLine();
             this.mat.getVideo().put(topic ,videoContent);
-            this.mat.setNameVideo(this.id);
+
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
-            this.mat.getTimeVideo().put(this.id, dtf.format(now));
+            this.mat.getTimeVideo().put(topic, dtf.format(now));
 
 
 
@@ -883,14 +893,19 @@ public class MainClass {
 
         HashMap<String, teacher> t = new HashMap<>();
         t.put("I0", new teacher());
+        t.get("I0").setId("I0");
         t.put("I1", new teacher());
-
+        t.get("I1").setId("I1");
         HashMap<String, student> s = new HashMap<>();
 
         s.put("S0", new student());
+
+        s.get("S0").setId("S0");
         s.put("S1", new student());
+        s.get("S1").setId("S1");
         s.put("S2", new student());
 
+        s.get("S2").setId("S2");
 
         InputStreamReader r = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(r);
@@ -907,12 +922,13 @@ public class MainClass {
                 if (n == 1) {
 
                     boolean running = true;
-                    while (running) {
-                        System.out.println("Plesase Enter the ID of instructor: ");
-                        String id = br.readLine();
-                        teacher temp = t.get(id);
+                    System.out.println("Plesase Enter the ID of instructor: ");
+                    String id = br.readLine();
+                    teacher temp = t.get(id);
 
-                        System.out.println("Welcome : " + id);
+                    System.out.println("Welcome : " + id);
+                    while (running) {
+
                         temp.printAllFunctions();
                         System.out.println("Enter the function to perform :");
                         switch (Integer.parseInt(br.readLine())) {
@@ -997,6 +1013,65 @@ public class MainClass {
                     }
 
                 } else if (n == 2) {
+
+
+                    boolean running =true;
+                    System.out.println("Plesase Enter the ID of  student : ");
+                    String id = br.readLine();
+                    student temp = s.get(id);
+
+                    System.out.println("Welcome : " + id);
+                    while(running ){
+
+
+                        temp.printAllFunctions();
+                        System.out.println("Enter the function to perform :");
+
+                        switch(Integer.parseInt(br.readLine())){
+
+
+                            case 1:
+                                for(String i  : t.keySet()){
+
+                                    System.out.println("Instructor :"
+                                    + i);
+                                   t.get(i).viewLectureMaterial();
+
+
+                                }
+
+                                break;
+                            case 2:
+                                temp.viewAssessments();
+                                break;
+                            case 3:
+                                break;
+                            case 4:
+                                temp.viewGrades();
+                                break;
+                            case 5:
+                                temp.viewComments(comm);
+
+                                break;
+                            case 6:
+                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                                LocalDateTime now = LocalDateTime.now();
+
+                                System.out.println("Add comment :");
+                                String c = br.readLine();
+                                temp.addComments(comm, dtf.format(now), id, c);
+                                break;
+                            case 7:
+                                temp.logout();
+                                running=false;
+
+
+
+                        }
+
+
+
+                    }
 
 
                 } else {
