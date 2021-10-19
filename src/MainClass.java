@@ -36,10 +36,7 @@ class student  implements googleClassroom{
         q= new HashMap<>();
 
     }
-    public void viewLectureMaterial(String topic){
 
-
-    }
 
 
     public String getId() {
@@ -123,6 +120,9 @@ class student  implements googleClassroom{
 
         }
 
+        System.out.println("Assigment :");
+
+
         for(String i : this.ass.keySet()){
 
 
@@ -142,6 +142,8 @@ class student  implements googleClassroom{
 
             System.out.println("Comment no: "+j+" TimeStamp :" +i.getTime() );
             System.out.println("Content :" +i.getContent());
+            System.out.println("Name :" +i.getName());
+
             j++;
 
 
@@ -187,12 +189,12 @@ class student  implements googleClassroom{
     public  void viewGrades(){
 
 
-        System.out.println("Graded Assigements :");
+        System.out.println("Graded Assesments :");
         for(String i : this.ass.keySet()){
 
 
 
-            if(this.ass.get(i).isSubmitted()){
+
 
                 System.out.println("Name of assigment : " +i);
                 System.out.println("Grade in assigemnt : " + this.ass.get(i).getMarks());
@@ -200,8 +202,18 @@ class student  implements googleClassroom{
 
 
 
-            }
 
+
+        }
+
+        System.out.println("Graded Quiz :");
+        for(String i :this.q.keySet()){
+
+
+
+            System.out.println("Name of the Quiz :" +i);
+            System.out.println("Grade of the Quiz :" +this.q.get(i).getGrade());
+            System.out.println("Graded by  :" +this.q.get(i).getGrade());
 
 
         }
@@ -223,6 +235,86 @@ class student  implements googleClassroom{
 
 
     }
+
+    public void submitAssesment(HashMap<String , teacher> h, BufferedReader br)  throws  Exception{
+
+
+        ArrayList<assigment> temp = new ArrayList<>();
+        int j=0;
+        for(String i : h.keySet()){
+            HashMap<String, assigment> a=h.get(i).getAss();
+            for(String k : a.keySet()){
+
+
+
+                System.out.println("ID :" +j + " Name : "+a.get(k).getName());
+                temp.add(a.get(k));
+                j++;
+
+            }
+
+
+
+
+
+        }
+
+        System.out.println("Enter the ID for assesement :");
+        int n=Integer.parseInt(br.readLine());
+        System.out.println("Enter the file name for submittion :");
+        String fileName =br.readLine();
+        assigment studentSubmission =temp.get(n);
+        studentSubmission.setSubmitted(true);
+        studentSubmission.setFileName(fileName);
+
+
+
+
+
+
+    }
+
+    public void submitQuiz(HashMap<String , teacher> h, BufferedReader br)  throws  Exception{
+
+
+        ArrayList<quiz> temp = new ArrayList<>();
+        int j=0;
+        for(String i : h.keySet()){
+            HashMap<String, quiz> a=h.get(i).getQ();
+            for(String k : a.keySet()){
+
+
+
+                System.out.println("ID :" +j + " Name : "+a.get(k).getName());
+                temp.add(a.get(k));
+                j++;
+
+            }
+
+
+
+
+
+        }
+
+
+        System.out.println("Enter the ID for Quiz :");
+        int n=Integer.parseInt(br.readLine());
+       System.out.println("Enter the answer");
+        String fileName =br.readLine();
+        quiz studentSubmission =temp.get(n);
+        studentSubmission.setStatus(true);
+        studentSubmission.setAnswer(fileName);
+
+
+
+
+
+
+    }
+
+
+
 
 
     public HashMap<String, quiz> getQ() {
@@ -252,7 +344,7 @@ class teacher implements googleClassroom
 
     private HashMap<String, assigment > ass;
 
-   // private HashMap<String , ArrayList<Integer>> assigment ;
+
 
     private String id;
 
@@ -276,23 +368,6 @@ public teacher(){
     public void setId(String id) {
         this.id = id;
     }
-
-    //public HashMap<String, ArrayList<String>> getSlide() {
-    //    return slide;
-   // }
-
- //   public HashMap<String, String> getVideo() {
-//        return video;
-  //  }
-
-  //  public void setSlide(HashMap<String, ArrayList<String>> slide) {
-   //     this.slide = slide;
-   // }
-
- //   public void setVideo(HashMap<String, String> video) {
-   //     this.video = video;
-    //}
-
 
 
     @Override
@@ -361,12 +436,18 @@ for(String i : this.q.keySet()){
     System.out.println(i + " , status  :" +((this.q.get(i).isOpen()) ? "Open" : "Closed") );
 
 
+
 }
+
+System.out.println("Assigment :");
+
 
 for(String i : this.ass.keySet()){
 
 
     System.out.println(i+ " , status :" +((this.ass.get(i).isStatus())? "Closed" :"Open" ));
+    System.out.println("Max Marks :" +this.ass.get(i).getMaxMarks());
+
 
 }
 
@@ -384,6 +465,7 @@ for(String i : this.ass.keySet()){
 
         System.out.println("Comment no: "+j+" TimeStamp :" +i.getTime() );
         System.out.println("Content :" +i.getContent());
+        System.out.println("Name :" +i.getName());
         j++;
 
 
@@ -482,6 +564,7 @@ for(String i : this.ass.keySet()){
 
         else{
 
+
             return ;
 
 
@@ -492,7 +575,7 @@ for(String i : this.ass.keySet()){
 
 
 
-    public void addQuiz(BufferedReader br, HashMap<String, quiz> h ,String topic  ) throws Exception {
+    public void addQuiz(BufferedReader br, HashMap<String, quiz> h ,String topic ,HashMap<String , student> st  ) throws Exception {
 
 
 
@@ -512,15 +595,20 @@ for(String i : this.ass.keySet()){
 
         this.q.put(topic, qu);
         h.put(topic, qu);
+        for(String i : st.keySet()){
+
+            st.get(i).getQ().put(topic, qu);
+
+        }
 
 
-            //   this.ass.put(topic,temp);
+
 
 
 
     }
 
-        public void addAssesment(BufferedReader br, HashMap<String , assigment> h,  String topic , int n) throws  Exception{
+        public void addAssesment(BufferedReader br, HashMap<String , assigment> h,  String topic , int n , HashMap<String, student> st) throws  Exception{
 
 
 
@@ -541,6 +629,13 @@ for(String i : this.ass.keySet()){
             this.ass.put(topic, temp);
             h.put(topic, temp);
 
+            for(String i : st.keySet()){
+
+                st.get(i).getAss().put(topic ,temp);
+
+
+            }
+
 
 
 
@@ -553,7 +648,7 @@ for(String i : this.ass.keySet()){
 
 
 
-    public void gradeAssesment(quiz temp,BufferedReader br) throws  Exception{
+    public void gradeAssesment(quiz temp , BufferedReader br) throws  Exception{
 
 
 
@@ -573,13 +668,13 @@ for(String i : this.ass.keySet()){
         System.out.println("Give grade :");
         int n=Integer.parseInt(br.readLine());
 
-        if(n!=1 ||  n!=0){
+        if(n!=1 && n!=0){
             System.out.println("The grade given must be 1 or 0 for quiz!!");
             return ;
-
-
         }
         temp.setGrade(n);
+        temp.setStatus(true);
+
 
 
     }
@@ -607,7 +702,9 @@ for(String i : this.ass.keySet()){
 
 
         }
-    temp.setMarks(n);
+
+        temp.setMarks(n);
+        temp.setStatus(true);
 
 
 
@@ -645,6 +742,29 @@ for(String i : this.ass.keySet()){
 
     }
 
+    public material getMat() {
+        return mat;
+    }
+
+    public void setMat(material mat) {
+        this.mat = mat;
+    }
+
+    public HashMap<String, quiz> getQ() {
+        return q;
+    }
+
+    public void setQ(HashMap<String, quiz> q) {
+        this.q = q;
+    }
+
+    public HashMap<String, assigment> getAss() {
+        return ass;
+    }
+
+    public void setAss(HashMap<String, assigment> ass) {
+        this.ass = ass;
+    }
 }
 
 
@@ -789,6 +909,15 @@ class quiz{
 
 class assigment{
 
+private String grader;
+
+    public String getGrader() {
+        return grader;
+    }
+
+    public void setGrader(String grader) {
+        this.grader = grader;
+    }
 
     private boolean status=false;
 
@@ -805,6 +934,7 @@ class assigment{
     private int maxMarks;
     private int marks=0;
     private boolean submitted=false;
+
 
     public boolean isSubmitted() {
         return submitted;
@@ -952,7 +1082,7 @@ public class MainClass {
                                     int marks = Integer.parseInt(br.readLine());
 
                                     for (String i : s.keySet()) {
-                                        temp.addAssesment(br, s.get(i).getAss(), topic, marks);
+                                        temp.addAssesment(br, s.get(i).getAss(), topic, marks ,s);
                                     }
 
                                 } else if (choice == 2) {
@@ -962,7 +1092,7 @@ public class MainClass {
 
                                     String topic = br.readLine();
                                     for (String i : s.keySet()) {
-                                        temp.addQuiz(br, s.get(i).getQ(), topic);
+                                        temp.addQuiz(br, s.get(i).getQ(), topic ,s);
                                     }
 
                                 }
@@ -988,8 +1118,80 @@ public class MainClass {
                                 System.out.println("Enter the name of the student you want to grade :");
                                 String studentName = br.readLine();
                                 student st = s.get(studentName);
-                                st.setAssigmentGrade( temp.getId());
+
+                                System.out.println("Do you want to grade the assigment(1) or Quiz(2) :");
+                                int get= Integer.parseInt(br.readLine());
+                                if(get ==1){
+
+
+                                    for(String i : st.getAss().keySet()){
+                                        System.out.println("Name :" +st.getAss().get(i).getName());
+
+
+                                    }
+                                    System.out.println("Enter the name of the assigemnt you want to grade: ");
+                                    String assName=br.readLine();
+
+                                    temp.gradeAssesment( st.getAss().get(assName),br);
+
+                                }
+
+                                else{
+
+                                    for(String i : st.getQ().keySet()){
+                                        System.out.println("Name :" +st.getQ().get(i).getName());
+
+
+                                    }
+
+                                    System.out.println("Enter the name of the quiz you want to grade :");
+                                    String qName =br.readLine();
+                                    temp.gradeAssesment(st.getQ().get(qName) ,br);
+
+                                }
+
                                 break;
+
+                            case 6:
+
+
+                                System.out.println("Do you want to close a Assigment or quiz :");
+                                int ch =Integer.parseInt(br.readLine());
+
+                                if(ch==1){
+
+
+                                    for(String i : temp.getAss().keySet()){
+
+                                        System.out.println("Name : "+i);
+
+
+                                    }
+
+
+                                    System.out.println("Enter the name of the assigment you want to close :");
+                                    String  name =br.readLine();
+                                    temp.closeAssesment(temp.getAss().get(name) ,br);
+
+                                }
+
+                                else{
+
+                                    for(String i : temp.getQ().keySet()){
+
+                                        System.out.println("Name :" +i);
+
+
+                                    }
+
+                                    System.out.println("Enter the name of the quiz you want to close");
+                                    String name= br.readLine();
+                                    temp.closeAssesment(temp.getQ().get(name), br);
+
+
+                                }
+                                break;
+
 
 
                             case 7:
@@ -1042,9 +1244,25 @@ public class MainClass {
 
                                 break;
                             case 2:
-                                temp.viewAssessments();
+                                for(String i : t.keySet()){
+
+
+                                    temp.viewAssessments(t.get(i));
+                                }
+
                                 break;
                             case 3:
+
+                                System.out.println("Do you want to submit Assigemnt(1) or Quiz(2)");
+                                int f=Integer.parseInt(br.readLine());
+                                if(f==1){
+
+
+                                    temp.submitAssesment(t ,br);
+                                }
+                                else {
+                                    temp.submitQuiz(t, br);
+                                }
                                 break;
                             case 4:
                                 temp.viewGrades();
@@ -1075,7 +1293,7 @@ public class MainClass {
 
 
                 } else {
-                    System.out.println("Logging Out!!");
+                    System.out.println("Exiting the program !!");
 
                     break;
 
